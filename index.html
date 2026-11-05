@@ -386,6 +386,21 @@
     .ov-col:nth-child(3) { grid-column: 1 / -1; border-left: 0; border-top: 2px solid var(--divider); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
     .ov-col:nth-child(3) .del-wrap { grid-column: 1 / -1; }
   }
+  @media (max-width: 1023px) {
+    .outline-test-btn, .outline-test-btn .hang { display: none !important; }
+    .hang.h-title { width: 26px; height: 26px; right: -30px; top: -16px; }
+    .hang.h-cart { width: 28px; height: 28px; left: -20px; top: -18px; }
+    .hang.h-left { width: 26px; height: 26px; left: 6px; bottom: -18px; }
+    .stat { padding: 0 10px; }
+    .today-view-btn { font-size: 13px; }
+    .sel-cell select { padding: 0 4px 0 10px; font-size: 13px; }
+    .sel-cell svg.i { display: none; }
+    .today-view-btn { padding: 0 12px; }
+    .tools-toggle-btn { width: 40px; }
+    .bar-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .bar .btn { font-size: 14px; padding: 0 12px; white-space: nowrap; }
+    .bar .btn svg.i { width: 20px; height: 20px; }
+  }
 </style>
 </head>
 <body class="locked">
