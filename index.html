@@ -1139,7 +1139,7 @@
       updateLineupStats(rows);
       return;
     }
-    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Instagram</th><th>Quién contacta</th>${LU_CHECKS.map(c => `<th>${c[1]}</th>`).join('')}<th>¿Viene?</th><th>Pagó</th><th></th></tr></thead>`;
+    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Instagram</th><th>Quién contacta</th><th>Contactado</th><th>¿Viene?</th><th>Form enviado</th><th>Form recibido</th><th>Pagó</th><th></th></tr></thead>`;
     const body = rows.map(r => `
       <tr data-id="${r.id}" data-ig="${r.instagram ? 1 : 0}" class="${luState(r)}">
         <td><input type="text" data-f="name" value="${escapeAttr(r.name || '')}" placeholder="Nombre" aria-label="Artista"></td>
@@ -1148,8 +1148,10 @@
           ? `<a class="ig-link" href="${escapeAttr(igUrl(r.instagram))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.instagram)}</a><button type="button" class="ig-edit" data-igedit="${r.id}" aria-label="Editar Instagram"><svg class="i" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`
           : `<input type="text" data-f="instagram" value="" placeholder="@usuario" aria-label="Instagram" autocapitalize="off" autocorrect="off">`}</td>
         <td><select data-f="contact" aria-label="Quién contacta">${opt(people, r.contact)}</select></td>
-        ${LU_CHECKS.map(c => `<td><input type="checkbox" class="chk" data-f="${c[0]}" ${r[c[0]] ? 'checked' : ''} aria-label="${c[1]}"></td>`).join('')}
+        <td><input type="checkbox" class="chk" data-f="invitar" ${r.invitar ? 'checked' : ''} aria-label="Contactado"></td>
         <td><select data-f="viene" aria-label="¿Viene?"><option value=""></option><option value="SÍ" ${r.viene === 'SÍ' ? 'selected' : ''}>SÍ</option><option value="NO" ${r.viene === 'NO' ? 'selected' : ''}>NO</option></select></td>
+        <td><input type="checkbox" class="chk" data-f="formEnviado" ${r.formEnviado ? 'checked' : ''} aria-label="Form enviado"></td>
+        <td><input type="checkbox" class="chk" data-f="formRecibido" ${r.formRecibido ? 'checked' : ''} aria-label="Form recibido"></td>
         <td><input type="checkbox" class="chk" data-f="pago" ${r.pago ? 'checked' : ''} aria-label="Pagó"></td>
         <td class="del"><button type="button" class="lu-del" data-del="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
       </tr>`).join('');
