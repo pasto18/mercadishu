@@ -401,6 +401,36 @@
     .bar .btn { font-size: 14px; padding: 0 12px; white-space: nowrap; }
     .bar .btn svg.i { width: 20px; height: 20px; }
   }
+  /* Puestos / LineUp */
+  #lineupOpenBtn .txt { display: none; }
+  .lu-inner { max-width: none; padding: 0; }
+  .lu-tools { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--divider); flex-wrap: wrap; }
+  .lu-tools .btn { width: auto; height: 44px; padding: 0 16px; }
+  .lu-stats { font-size: 13px; color: var(--n700); margin-left: auto; }
+  .lu-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+  .lu-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 980px; font-size: 14px; }
+  .lu-table th { position: sticky; top: 0; z-index: 3; background: var(--ink); color: var(--bg); font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; text-align: center; padding: 12px 8px; white-space: nowrap; }
+  .lu-table th:first-child, .lu-table td:first-child { position: sticky; left: 0; z-index: 2; text-align: left; }
+  .lu-table th:first-child { z-index: 4; padding-left: 12px; }
+  .lu-table td { padding: 0; border-bottom: 1px solid var(--divider); text-align: center; background: var(--bg); height: 46px; }
+  .lu-table tr:nth-child(even) td { background: var(--surface); }
+  .lu-table tr.st-si td:first-child { box-shadow: inset 6px 0 0 #73ba9b; }
+  .lu-table tr.st-no td:first-child { box-shadow: inset 6px 0 0 var(--accent); }
+  .lu-table td input[type=text], .lu-table td select { width: 100%; height: 46px; border: 0; background: transparent; font-size: 14px; font-weight: 600; padding: 0 10px 0 16px; color: var(--ink); }
+  .lu-table td select { padding: 0 8px; text-align: center; text-align-last: center; }
+  .lu-table td input[type=text] { min-width: 170px; }
+  .lu-table td input[type=text]:focus, .lu-table td select:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .lu-table .chk { width: 22px; height: 22px; accent-color: var(--ink); }
+  .lu-table td.del { width: 44px; }
+  .lu-del { width: 44px; height: 46px; display: flex; align-items: center; justify-content: center; color: var(--n600); }
+  .lu-del svg.i { width: 18px; height: 18px; }
+  .lu-empty { padding: 40px 16px; text-align: center; color: var(--n700); }
+  @media (min-width: 1024px) {
+    #lineupOpenBtn { grid-column: 4; grid-row: 1; justify-self: end; margin-right: 40px; width: auto; height: 44px; padding: 0 16px; border: 1px solid var(--ink); gap: 8px; font-weight: 800; font-size: 15px; }
+    #lineupOpenBtn .txt { display: inline; }
+    #lineupOpenBtn svg.i { width: 20px; height: 20px; }
+    .lu-table { min-width: 0; }
+  }
 </style>
 </head>
 <body class="locked">
@@ -428,6 +458,7 @@
           <div class="title"><span class="tw">Mercadishu<svg class="deco hang h-title" viewBox="0 0 512 512" aria-hidden="true"><use href="#deco-reindeer"/></svg></span></div>
           <div class="sub" id="subLine">&nbsp;</div>
         </div>
+        <button class="icon-btn" id="lineupOpenBtn" aria-label="Puestos / LineUp"><svg class="i" viewBox="0 0 24 24"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="txt">Puestos / LineUp</span></button>
         <button class="icon-btn" id="shoppingOpenBtn" aria-label="Lista de compras"><svg class="deco hang h-cart" viewBox="0 0 512 512" aria-hidden="true"><use href="#deco-moth"/></svg>
           <svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
           <span class="badge" id="shopBadge" hidden></span>
@@ -590,6 +621,20 @@
   </div>
 
   <!-- Shopping list -->
+  <div class="overlay" id="lineupOverlay">
+    <div class="ov-inner lu-inner">
+      <div class="ov-head">
+        <button class="icon-btn" id="lineupBackBtn" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+        <div class="h">Puestos / LineUp</div>
+      </div>
+      <div class="lu-tools">
+        <button type="button" class="btn btn-pri" id="lineupAddBtn">Añadir<svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+        <span class="lu-stats" id="lineupStats"></span>
+      </div>
+      <div class="lu-wrap"><table class="lu-table" id="lineupTable"></table></div>
+    </div>
+  </div>
+
   <div class="overlay" id="shoppingOverlay">
     <div class="ov-inner">
       <div class="ov-head">
@@ -637,11 +682,12 @@
   // Tablero COMPARTIDO: todo el equipo ve y edita lo mismo (boards/mercadishu/...).
   // A diferencia de la plantilla "Tareas" (datos separados por usuario), aquí no hay users/{uid}.
   const BOARD = 'mercadishu';
-  let tasksCol = null, listsRef = null;
+  let tasksCol = null, listsRef = null, lineupCol = null;
   const taskDoc = (id) => doc(tasksCol, id);
   function setUserRefs(user) {
     tasksCol = user ? collection(db, 'boards', BOARD, 'tasks') : null;
     listsRef = user ? doc(db, 'boards', BOARD, 'settings', 'lists') : null;
+    lineupCol = user ? collection(db, 'boards', BOARD, 'lineup') : null;
   }
 
   // ---- Tareas iniciales: sacadas de la reunión de producción ----
@@ -1043,10 +1089,90 @@
   }
 
   // ---- Acceso: Firebase Authentication (la clave vive en Firebase, no en el código) ----
-  let unsubTasks = null, unsubLists = null;
+  // ---- Puestos / LineUp: tabla compartida de artistas (boards/mercadishu/lineup/{id}) ----
+  let lineup = [];
+  let lineupFocusId = null;
+  const LU_DISCIPLINES = ['TATTOOS', 'LIBROS', 'TAROT', 'ILUSTRACIÓN', 'ROPA', 'CASSETTES', 'OTROS'];
+  const LU_CHECKS = [['invitar', 'Invitar'], ['visado', 'Visado'], ['si', 'Sí'], ['no', 'No'], ['formEnviado', 'Form enviado'], ['formRecibido', 'Form recibido'], ['pago', 'Pagó']];
+  const lineupOverlay = document.getElementById('lineupOverlay');
+  const lineupTable = document.getElementById('lineupTable');
+  function updateLineupStats(rows) {
+    const n = f => rows.filter(r => r[f]).length;
+    document.getElementById('lineupStats').textContent = `${rows.length} en la lista · ${n('si')} sí · ${n('no')} no · ${n('pago')} pagaron`;
+  }
+  function renderLineup() {
+    if (!lineupOverlay.classList.contains('open')) return;
+    const ae = document.activeElement;
+    if (ae && lineupTable.contains(ae) && ae.tagName === 'INPUT' && ae.type === 'text') return; // no pisar lo que se está escribiendo
+    const rows = [...lineup].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }) || (a.created || 0) - (b.created || 0));
+    const people = [...new Set([...NAMES, ...rows.map(r => r.contact).filter(Boolean)])];
+    const discs = [...new Set([...LU_DISCIPLINES, ...rows.map(r => r.discipline).filter(Boolean)])];
+    const opt = (list, cur) => `<option value=""></option>` + list.map(v => `<option value="${escapeAttr(v)}" ${v === cur ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('');
+    // si las filas son las mismas y en el mismo orden, se actualizan los valores en su sitio (no se pierde el foco ni los clics)
+    const domIds = [...lineupTable.querySelectorAll('tbody tr[data-id]')].map(tr => tr.dataset.id);
+    if (domIds.length && domIds.join() === rows.map(r => r.id).join()) {
+      rows.forEach(r => {
+        const tr = lineupTable.querySelector(`tr[data-id="${r.id}"]`);
+        tr.className = r.si ? 'st-si' : r.no ? 'st-no' : '';
+        tr.querySelectorAll('[data-f]').forEach(el => {
+          if (el === document.activeElement) return;
+          if (el.type === 'checkbox') el.checked = !!r[el.dataset.f];
+          else if (el.value !== (r[el.dataset.f] || '')) el.value = r[el.dataset.f] || '';
+        });
+      });
+      updateLineupStats(rows);
+      return;
+    }
+    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Quién contacta</th>${LU_CHECKS.map(c => `<th>${c[1]}</th>`).join('')}<th></th></tr></thead>`;
+    const body = rows.map(r => `
+      <tr data-id="${r.id}" class="${r.si ? 'st-si' : r.no ? 'st-no' : ''}">
+        <td><input type="text" data-f="name" value="${escapeAttr(r.name || '')}" placeholder="Nombre" aria-label="Artista"></td>
+        <td><select data-f="discipline" aria-label="Disciplina">${opt(discs, r.discipline)}</select></td>
+        <td><select data-f="contact" aria-label="Quién contacta">${opt(people, r.contact)}</select></td>
+        ${LU_CHECKS.map(c => `<td><input type="checkbox" class="chk" data-f="${c[0]}" ${r[c[0]] ? 'checked' : ''} aria-label="${c[1]}"></td>`).join('')}
+        <td class="del"><button type="button" class="lu-del" data-del="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+      </tr>`).join('');
+    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
+    updateLineupStats(rows);
+    if (lineupFocusId) {
+      const el = lineupTable.querySelector(`tr[data-id="${lineupFocusId}"] input[data-f="name"]`);
+      if (el) el.focus();
+      lineupFocusId = null;
+    }
+  }
+  document.getElementById('lineupOpenBtn').addEventListener('click', () => { lineupOverlay.classList.add('open'); renderLineup(); });
+  document.getElementById('lineupBackBtn').addEventListener('click', () => lineupOverlay.classList.remove('open'));
+  document.getElementById('lineupAddBtn').addEventListener('click', async () => {
+    try {
+      const ref = await addDoc(lineupCol, { name: '', discipline: '', contact: '', created: Date.now() });
+      lineupFocusId = ref.id;
+    } catch (e) { console.error(e); }
+  });
+  lineupTable.addEventListener('change', (e) => {
+    const el = e.target.closest('[data-f]');
+    const tr = e.target.closest('tr[data-id]');
+    if (!el || !tr) return;
+    const f = el.dataset.f;
+    let val = el.type === 'checkbox' ? el.checked : el.value.trim();
+    const patch = { [f]: val };
+    // Sí y No son excluyentes
+    if (el.type === 'checkbox' && val && (f === 'si' || f === 'no')) patch[f === 'si' ? 'no' : 'si'] = false;
+    updateDoc(doc(db, 'boards', BOARD, 'lineup', tr.dataset.id), patch).catch(console.error);
+  });
+  lineupTable.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('input[type=text]')) e.target.blur(); });
+  lineupTable.addEventListener('focusout', () => setTimeout(renderLineup, 150));
+  lineupTable.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-del]');
+    if (!b) return;
+    const row = lineup.find(r => r.id === b.dataset.del);
+    if (confirm(`¿Borrar "${(row && row.name) || 'esta fila'}" de la lista?`)) deleteDoc(doc(db, 'boards', BOARD, 'lineup', b.dataset.del)).catch(console.error);
+  });
+
+  let unsubTasks = null, unsubLists = null, unsubLineup = null;
   function startData() {
     if (unsubTasks) return;
     unsubTasks = onSnapshot(tasksCol, mergeSnapshot, (err) => console.error('Firestore:', err));
+    unsubLineup = onSnapshot(lineupCol, (snap) => { lineup = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderLineup(); }, (err) => console.error('Firestore lineup:', err));
     unsubLists = onSnapshot(listsRef, (snap) => {
       if (!snap.exists()) {
         // Primera vez: crea las listas y carga las tareas de la reunión (ids fijos: no se duplican).
@@ -1066,7 +1192,10 @@
   function stopData() {
     if (unsubTasks) unsubTasks();
     if (unsubLists) unsubLists();
-    unsubTasks = unsubLists = null;
+    if (unsubLineup) unsubLineup();
+    unsubTasks = unsubLists = unsubLineup = null;
+    lineup = [];
+    document.getElementById('lineupOverlay').classList.remove('open');
     gToken = null; gTokenExp = 0;
     try { localStorage.removeItem(GTOKEN_KEY); } catch (e) {}
     tasks = [];
