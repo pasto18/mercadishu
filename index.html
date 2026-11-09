@@ -329,7 +329,7 @@
   @media (min-width: 1024px) {
     .wrap { max-width: none; padding: 0 20px 32px; }
     .bar, .legend { display: none; }
-    .head { display: grid; grid-template-columns: auto auto auto 1fr auto auto; align-items: center; column-gap: 8px; border-bottom: 2px solid var(--divider); }
+    .head { display: grid; grid-template-columns: auto auto auto 1fr auto auto auto; align-items: center; column-gap: 8px; border-bottom: 2px solid var(--divider); }
     .top { display: contents; }
     .filters-block { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; gap: 16px; padding: 4px 0 12px; }
     .top-text { grid-column: 1; grid-row: 1; flex: none; padding: 12px 28px 10px 0; }
@@ -342,8 +342,11 @@
     .top-btn.pri:active { background: var(--a700); }
     #planToggleBtn2 { grid-column: 2; grid-row: 1; }
     #addToggleBtn2 { grid-column: 3; grid-row: 1; }
-    #shoppingOpenBtn { grid-column: 5; grid-row: 1; }
-    #logoutBtn { grid-column: 6; grid-row: 1; }
+    #economyOpenBtn { grid-column: 5; grid-row: 1; margin-right: 40px; width: auto; height: 44px; padding: 0 16px; border: 1px solid var(--ink); gap: 8px; font-weight: 800; font-size: 15px; }
+    #economyOpenBtn .txt { display: inline; }
+    #economyOpenBtn svg.i { width: 20px; height: 20px; }
+    #shoppingOpenBtn { grid-column: 6; grid-row: 1; }
+    #logoutBtn { grid-column: 7; grid-row: 1; }
     .sel-grid { display: flex; border: 1px solid var(--divider); max-height: none; }
     .sel-cell select { width: 210px; }
     .plan-banner { grid-column: 1 / -1; grid-row: 3; margin-bottom: 8px; }
@@ -402,7 +405,7 @@
     .bar .btn svg.i { width: 20px; height: 20px; }
   }
   /* Puestos / LineUp */
-  #lineupOpenBtn .txt { display: none; }
+  #lineupOpenBtn .txt, #economyOpenBtn .txt { display: none; }
   .lu-inner { max-width: none; padding: 0; }
   .lu-tools { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--divider); flex-wrap: wrap; }
   .lu-tools .btn { width: auto; height: 44px; padding: 0 16px; }
@@ -426,11 +429,34 @@
   .lu-del svg.i { width: 18px; height: 18px; }
   .lu-empty { padding: 40px 16px; text-align: center; color: var(--n700); }
   @media (min-width: 1024px) {
-    #lineupOpenBtn { grid-column: 4; grid-row: 1; justify-self: end; margin-right: 40px; width: auto; height: 44px; padding: 0 16px; border: 1px solid var(--ink); gap: 8px; font-weight: 800; font-size: 15px; }
+    #lineupOpenBtn { grid-column: 4; grid-row: 1; justify-self: end; margin-right: 0; width: auto; height: 44px; padding: 0 16px; border: 1px solid var(--ink); gap: 8px; font-weight: 800; font-size: 15px; }
     #lineupOpenBtn .txt { display: inline; }
     #lineupOpenBtn svg.i { width: 20px; height: 20px; }
     .lu-table { min-width: 0; }
   }
+  /* Economía */
+  .ec-inner { max-width: 1000px; padding: 0 12px 80px; }
+  .ec-sum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--divider); margin: 12px 0; }
+  .ec-sum > div { padding: 10px 12px; }
+  .ec-sum > div + div { border-left: 1px solid var(--divider); }
+  .ec-sum small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--n700); }
+  .ec-sum b { font-size: 20px; font-weight: 800; }
+  .ec-sum .bal { background: var(--surface); }
+  .ec-sum .bal.pos b { color: var(--n700); }
+  .ec-sum .bal.neg b { color: var(--a700); }
+  .ec-cols { display: grid; gap: 16px; }
+  .ec-box { border: 1px solid var(--divider); }
+  .ec-h { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--ink); color: var(--bg); font-weight: 800; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+  .ec-h .tot { margin-left: auto; letter-spacing: 0; font-size: 14px; }
+  .ec-h .proj-add { color: var(--bg); }
+  .ec-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 40px; align-items: center; border-bottom: 1px solid var(--divider); }
+  .ec-row:nth-child(even) { background: var(--surface); }
+  .ec-row input { width: 100%; height: 46px; border: 0; background: transparent; font-size: 14px; font-weight: 600; padding: 0 10px 0 12px; color: var(--ink); }
+  .ec-row input[type=number] { text-align: right; padding-right: 6px; }
+  .ec-row input:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .ec-row .lu-del { width: 40px; }
+  .ec-empty { padding: 18px 12px; text-align: center; color: var(--n700); font-size: 14px; }
+  @media (min-width: 1024px) { .ec-cols { grid-template-columns: 1fr 1fr; align-items: start; } .ec-inner { margin: 0 auto; } }
   .lu-table td.info { min-width: 190px; max-width: 240px; }
   .info-cell { display: block; width: 100%; height: 46px; padding: 0 12px; text-align: left; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .info-cell.empty { color: var(--n600); font-weight: 700; }
@@ -472,6 +498,7 @@
           <div class="sub" id="subLine">&nbsp;</div>
         </div>
         <button class="icon-btn" id="lineupOpenBtn" aria-label="Puestos / LineUp"><svg class="i" viewBox="0 0 24 24"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg><span class="txt">Puestos / LineUp</span></button>
+        <button class="icon-btn" id="economyOpenBtn" aria-label="Economía"><svg class="i" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg><span class="txt">Economía</span></button>
         <button class="icon-btn" id="shoppingOpenBtn" aria-label="Lista de compras"><svg class="deco hang h-cart" viewBox="0 0 512 512" aria-hidden="true"><use href="#deco-moth"/></svg>
           <svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
           <span class="badge" id="shopBadge" hidden></span>
@@ -633,6 +660,18 @@
     </div>
   </div>
 
+  <!-- Economía -->
+  <div class="overlay" id="economyOverlay">
+    <div class="ov-inner ec-inner">
+      <div class="ov-head" style="margin:0 -12px">
+        <button class="icon-btn" id="economyBackBtn" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+        <div class="h">Economía</div>
+      </div>
+      <div class="ec-sum" id="ecSum"></div>
+      <div class="ec-cols" id="ecCols"></div>
+    </div>
+  </div>
+
   <!-- Shopping list -->
   <div class="overlay" id="lineupOverlay">
     <div class="ov-inner lu-inner">
@@ -695,11 +734,12 @@
   // Tablero COMPARTIDO: todo el equipo ve y edita lo mismo (boards/mercadishu/...).
   // A diferencia de la plantilla "Tareas" (datos separados por usuario), aquí no hay users/{uid}.
   const BOARD = 'mercadishu';
-  let tasksCol = null, listsRef = null, lineupCol = null;
+  let tasksCol = null, listsRef = null, lineupCol = null, econCol = null;
   const taskDoc = (id) => doc(tasksCol, id);
   function setUserRefs(user) {
     tasksCol = user ? collection(db, 'boards', BOARD, 'tasks') : null;
     listsRef = user ? doc(db, 'boards', BOARD, 'settings', 'lists') : null;
+    econCol = user ? collection(db, 'boards', BOARD, 'economy') : null;
     lineupCol = user ? collection(db, 'boards', BOARD, 'lineup') : null;
   }
 
@@ -1247,10 +1287,83 @@
     if (confirm(`¿Borrar "${(row && row.name) || 'esta fila'}" de la lista?`)) deleteDoc(doc(db, 'boards', BOARD, 'lineup', b.dataset.del)).catch(console.error);
   });
 
-  let unsubTasks = null, unsubLists = null, unsubLineup = null;
+  // ---------- Economía: posibles ingresos y gastos ----------
+  let econ = [];
+  const econOverlay = document.getElementById('economyOverlay');
+  const ecCols = document.getElementById('ecCols');
+  const eur = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const ecTotals = () => {
+    const sum = t => econ.filter(x => x.type === t).reduce((n, x) => n + (Number(x.amount) || 0), 0);
+    const inc = sum('in'), out = sum('out');
+    return { inc, out, bal: inc - out };
+  };
+  function updateEconSummary() {
+    const { inc, out, bal } = ecTotals();
+    document.getElementById('ecSum').innerHTML = `
+      <div><small>Ingresos</small><b>${eur(inc)}</b></div>
+      <div><small>Gastos</small><b>${eur(out)}</b></div>
+      <div class="bal ${bal < 0 ? 'neg' : 'pos'}"><small>Balance</small><b>${bal > 0 ? '+' : ''}${eur(bal)}</b></div>`;
+    const t = { in: inc, out };
+    ecCols.querySelectorAll('[data-tot]').forEach(el => { el.textContent = eur(t[el.dataset.tot]); });
+  }
+  function renderEconomy() {
+    if (!econOverlay.classList.contains('open')) return;
+    const ae = document.activeElement;
+    if (ae && ecCols.contains(ae)) { updateEconSummary(); return; } // no pisar lo que se está escribiendo
+    const box = (type, title) => {
+      const rows = econ.filter(x => x.type === type).sort((a, b) => (a.created || 0) - (b.created || 0));
+      return `<div class="ec-box">
+        <div class="ec-h"><span>${title}</span><span class="tot" data-tot="${type}"></span>
+          <button type="button" class="proj-add" data-ecadd="${type}" aria-label="Añadir"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div>
+        ${rows.map(r => `<div class="ec-row" data-id="${r.id}">
+          <input type="text" data-ef="concept" value="${escapeAttr(r.concept || '')}" placeholder="Concepto" aria-label="Concepto">
+          <input type="number" data-ef="amount" step="0.01" inputmode="decimal" value="${r.amount === undefined || r.amount === null ? '' : escapeAttr(String(r.amount))}" placeholder="0,00 €" aria-label="Importe">
+          <button type="button" class="lu-del" data-ecdel="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>`).join('') || `<div class="ec-empty">Nada todavía. Pulsa + para añadir.</div>`}
+      </div>`;
+    };
+    ecCols.innerHTML = box('in', 'Posibles ingresos') + box('out', 'Posibles gastos');
+    updateEconSummary();
+    if (econFocusId) {
+      const el = ecCols.querySelector(`.ec-row[data-id="${econFocusId}"] input[data-ef="concept"]`);
+      if (el) el.focus();
+      econFocusId = null;
+    }
+  }
+  let econFocusId = null;
+  document.getElementById('economyOpenBtn').addEventListener('click', () => { econOverlay.classList.add('open'); renderEconomy(); });
+  document.getElementById('economyBackBtn').addEventListener('click', () => econOverlay.classList.remove('open'));
+  ecCols.addEventListener('click', async (e) => {
+    const add = e.target.closest('[data-ecadd]');
+    if (add) {
+      try { const ref = await addDoc(econCol, { type: add.dataset.ecadd, concept: '', amount: 0, created: Date.now() }); econFocusId = ref.id; }
+      catch (err) { console.error(err); }
+      return;
+    }
+    const del = e.target.closest('[data-ecdel]');
+    if (!del) return;
+    const row = econ.find(x => x.id === del.dataset.ecdel);
+    if (confirm(`¿Borrar "${(row && row.concept) || 'esta línea'}"?`)) deleteDoc(doc(db, 'boards', BOARD, 'economy', del.dataset.ecdel)).catch(console.error);
+  });
+  ecCols.addEventListener('input', (e) => {
+    const el = e.target.closest('[data-ef="amount"]'); if (!el) return;
+    const row = econ.find(x => x.id === el.closest('.ec-row').dataset.id);
+    if (row) { row.amount = parseFloat(el.value) || 0; updateEconSummary(); }
+  });
+  ecCols.addEventListener('change', (e) => {
+    const el = e.target.closest('[data-ef]'); if (!el) return;
+    const id = el.closest('.ec-row').dataset.id;
+    const val = el.dataset.ef === 'amount' ? (parseFloat(el.value) || 0) : el.value.trim();
+    updateDoc(doc(db, 'boards', BOARD, 'economy', id), { [el.dataset.ef]: val }).catch(console.error);
+  });
+  ecCols.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('input')) e.target.blur(); });
+  ecCols.addEventListener('focusout', () => setTimeout(renderEconomy, 150));
+
+  let unsubTasks = null, unsubLists = null, unsubLineup = null, unsubEcon = null;
   function startData() {
     if (unsubTasks) return;
     unsubTasks = onSnapshot(tasksCol, mergeSnapshot, (err) => console.error('Firestore:', err));
+    unsubEcon = onSnapshot(econCol, (snap) => { econ = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderEconomy(); }, (err) => console.error('Firestore economy:', err));
     unsubLineup = onSnapshot(lineupCol, (snap) => { lineup = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderLineup(); }, (err) => console.error('Firestore lineup:', err));
     unsubLists = onSnapshot(listsRef, (snap) => {
       if (!snap.exists()) {
@@ -1272,8 +1385,10 @@
     if (unsubTasks) unsubTasks();
     if (unsubLists) unsubLists();
     if (unsubLineup) unsubLineup();
-    unsubTasks = unsubLists = unsubLineup = null;
-    lineup = [];
+    if (unsubEcon) unsubEcon();
+    unsubTasks = unsubLists = unsubLineup = unsubEcon = null;
+    lineup = []; econ = [];
+    econOverlay.classList.remove('open');
     document.getElementById('lineupOverlay').classList.remove('open');
     gToken = null; gTokenExp = 0;
     try { localStorage.removeItem(GTOKEN_KEY); } catch (e) {}
