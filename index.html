@@ -440,7 +440,7 @@
   .ec-sum > div { padding: 10px 12px; }
   .ec-sum > div + div { border-left: 1px solid var(--divider); }
   .ec-sum small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--n700); }
-  .ec-sum b { font-size: 20px; font-weight: 800; }
+  .ec-sum b { font-size: 17px; font-weight: 800; white-space: nowrap; }
   .ec-sum .bal { background: var(--surface); }
   .ec-sum .bal.pos b { color: var(--n700); }
   .ec-sum .bal.neg b { color: var(--a700); }
@@ -470,6 +470,18 @@
   .ig-edit { width: 32px; height: 32px; vertical-align: middle; color: var(--n600); }
   .ig-edit svg.i { width: 15px; height: 15px; }
   .lu-table td.ig input[type=text] { min-width: 140px; padding-left: 12px; }
+  @media (max-width: 1023px) {
+    .top { padding-right: 0; }
+    .top .icon-btn { width: 38px; }
+    .top .icon-btn svg.i { width: 22px; height: 22px; }
+    .title { font-size: 28px; }
+    body.scrolled .title { font-size: 19px; }
+    .sub { white-space: nowrap; text-overflow: ellipsis; }
+  }
+  /* la papelera queda siempre visible al deslizar la tabla */
+  .lu-table th:last-child, .lu-table td.del { position: sticky; right: 0; z-index: 2; box-shadow: -1px 0 0 var(--divider); }
+  .lu-table th:last-child { z-index: 4; }
+  .lu-table td input[type=text] { min-width: 130px; }
 </style>
 </head>
 <body class="locked">
