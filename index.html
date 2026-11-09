@@ -484,7 +484,7 @@
         <div class="stat-grid" id="statusFilters">
           <button class="stat on" data-status="pending"><b>Pendientes</b><span data-count="pending">0</span></button>
           <button class="stat on" data-status="progress"><b>En curso</b><span data-count="progress">0</span></button>
-          <button class="stat" data-status="done"><b>Hechas</b><span data-count="done">0</span></button>
+          <button class="stat on" data-status="done"><b>Hechas</b><span data-count="done">0</span></button>
           <button class="stat" id="highPriorityFilterBtn"><b>Prioridad alta</b><span data-count="highPriority">0</span></button>
         </div>
         <div class="sel-grid">
@@ -850,7 +850,7 @@
   }
 
   let tasks = [];
-  let activeStatuses = { pending: true, progress: true, done: false };
+  let activeStatuses = { pending: true, progress: true, done: true };
   let highPriorityOnly = false;
   let toolsVisible = false;
   let subsVisible = true;
