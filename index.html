@@ -1217,10 +1217,9 @@
   document.getElementById('lineupOpenBtn').addEventListener('click', () => { lineupOverlay.classList.add('open'); renderLineup(); });
   document.getElementById('lineupBackBtn').addEventListener('click', () => { closeInfoPop(); lineupOverlay.classList.remove('open'); });
   document.getElementById('lineupAddBtn').addEventListener('click', async () => {
-    try {
-      const ref = await addDoc(lineupCol, { name: '', discipline: '', contact: '', created: Date.now() });
-      lineupFocusId = ref.id;
-    } catch (e) { console.error(e); }
+    const ref = doc(lineupCol);
+    lineupFocusId = ref.id;
+    setDoc(ref, { name: '', discipline: '', contact: '', created: Date.now() }).catch(console.error);
   });
   lineupTable.addEventListener('change', (e) => {
     const el = e.target.closest('[data-f]');
@@ -1309,7 +1308,7 @@
   function renderEconomy() {
     if (!econOverlay.classList.contains('open')) return;
     const ae = document.activeElement;
-    if (ae && ecCols.contains(ae)) { updateEconSummary(); return; } // no pisar lo que se está escribiendo
+    if (ae && ecCols.contains(ae) && ae.tagName === 'INPUT') { updateEconSummary(); return; } // no pisar lo que se está escribiendo
     const box = (type, title) => {
       const rows = econ.filter(x => x.type === type).sort((a, b) => (a.created || 0) - (b.created || 0));
       return `<div class="ec-box">
@@ -1336,8 +1335,9 @@
   ecCols.addEventListener('click', async (e) => {
     const add = e.target.closest('[data-ecadd]');
     if (add) {
-      try { const ref = await addDoc(econCol, { type: add.dataset.ecadd, concept: '', amount: 0, created: Date.now() }); econFocusId = ref.id; }
-      catch (err) { console.error(err); }
+      const ref = doc(econCol);
+      econFocusId = ref.id; // antes de escribir: el snapshot local se pinta al instante y ya enfoca la línea nueva
+      setDoc(ref, { type: add.dataset.ecadd, concept: '', amount: 0, created: Date.now() }).catch(console.error);
       return;
     }
     const del = e.target.closest('[data-ecdel]');
