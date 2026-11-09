@@ -1381,7 +1381,7 @@
         ${isDoneGroup ? '<span class="done-tag">Hecha</span>' : ''}
         <button type="button" class="proj-add" data-action="add-for-project" data-project="${escapeAttr(g.loc)}" aria-label="Añadir tarea aquí">${ICON.plus}</button>
       </div>
-      ${g.items.map(t => taskRowHtml(t, todayStr, section)).join('')}`).join('');
+      ${g.items.map(t => taskRowHtml(t, todayStr, t.status === 'done' ? 'done' : section)).join('')}`).join('');
   }
 
   const desktopMq = window.matchMedia('(min-width: 1024px)');
@@ -1402,7 +1402,7 @@
         <button type="button" class="proj-add" data-action="add-for-project" data-project="${escapeAttr(c.project)}" aria-label="Añadir tarea aquí">${ICON.plus}</button>
       </div>
       ${c.open.map(t => taskRowHtml(t, todayStr, 'notDone')).join('')}
-      ${c.closed.length ? `<div class="col-done">Hechas · ${c.closed.length}</div>${c.closed.map(t => taskRowHtml(t, todayStr, 'done')).join('')}` : ''}`;
+      ${c.closed.map(t => taskRowHtml(t, todayStr, 'done')).join('')}`;
   }
   function renderColumns(notDone, done, todayStr, extraHtml) {
     const keys = [...PROJECTS];
@@ -1485,8 +1485,7 @@
       if (desktopMq.matches) {
         html += renderColumns(notDone, done, todayStr);
       } else {
-        html += renderGroupWithProjectHeaders(notDone, todayStr, false, 'notDone');
-        html += renderGroupWithProjectHeaders(done, todayStr, true, 'done');
+        html += renderGroupWithProjectHeaders([...notDone, ...done].sort(taskSortCompare), todayStr, false, 'notDone');
       }
     }
     if (!html) html = `<div class="empty"><svg class="deco" viewBox="0 0 64 64" aria-hidden="true"><use href="#deco-scarecrow"/></svg><b>Nada por aquí</b><span>Cambia los filtros de arriba o añade una tarea nueva.</span></div>`;
