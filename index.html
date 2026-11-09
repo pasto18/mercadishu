@@ -431,6 +431,14 @@
     #lineupOpenBtn svg.i { width: 20px; height: 20px; }
     .lu-table { min-width: 0; }
   }
+  .lu-table td.info { min-width: 190px; max-width: 240px; }
+  .info-cell { display: block; width: 100%; height: 46px; padding: 0 12px; text-align: left; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info-cell.empty { color: var(--n600); font-weight: 700; }
+  .info-pop { position: fixed; z-index: 400; width: min(320px, calc(100vw - 16px)); background: var(--bg); border: 2px solid var(--ink); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,62,31,.25); padding: 8px; }
+  .info-pop::before { content: ''; position: absolute; top: -8px; left: var(--ax, 24px); width: 12px; height: 12px; background: var(--bg); border-left: 2px solid var(--ink); border-top: 2px solid var(--ink); transform: rotate(45deg); }
+  .info-pop.up::before { top: auto; bottom: -8px; transform: rotate(225deg); }
+  .info-pop textarea { display: block; width: 100%; min-height: 120px; max-height: 40vh; resize: vertical; border: 0; background: transparent; font: inherit; font-size: 14px; line-height: 1.4; color: var(--ink); padding: 4px; }
+  .info-pop textarea:focus { outline: none; }
   .lu-table td.ig { min-width: 150px; white-space: nowrap; }
   .ig-link { color: var(--a700); font-weight: 700; text-decoration: underline; padding: 12px 4px 12px 12px; display: inline-block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
   .ig-edit { width: 32px; height: 32px; vertical-align: middle; color: var(--n600); }
@@ -1130,6 +1138,8 @@
       rows.forEach(r => {
         const tr = lineupTable.querySelector(`tr[data-id="${r.id}"]`);
         tr.className = luState(r);
+        const ib = tr.querySelector('.info-cell');
+        if (ib) { ib.textContent = r.info || '+ info'; ib.classList.toggle('empty', !r.info); }
         tr.querySelectorAll('[data-f]').forEach(el => {
           if (el === document.activeElement) return;
           if (el.type === 'checkbox') el.checked = !!r[el.dataset.f];
@@ -1139,11 +1149,12 @@
       updateLineupStats(rows);
       return;
     }
-    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Instagram</th><th>Quién contacta</th><th>Contactado</th><th>¿Viene?</th><th>Form enviado</th><th>Form recibido</th><th>Pagó</th><th></th></tr></thead>`;
+    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>+ Info</th><th>Instagram</th><th>Quién contacta</th><th>Contactado</th><th>¿Viene?</th><th>Form enviado</th><th>Form recibido</th><th>Pagó</th><th></th></tr></thead>`;
     const body = rows.map(r => `
       <tr data-id="${r.id}" data-ig="${r.instagram ? 1 : 0}" class="${luState(r)}">
         <td><input type="text" data-f="name" value="${escapeAttr(r.name || '')}" placeholder="Nombre" aria-label="Artista"></td>
         <td><select data-f="discipline" aria-label="Disciplina">${opt(discs, r.discipline)}</select></td>
+        <td class="info"><button type="button" class="info-cell ${r.info ? '' : 'empty'}" data-info="${r.id}" aria-label="+ Info">${r.info ? escapeHtml(r.info) : '+ info'}</button></td>
         <td class="ig">${r.instagram
           ? `<a class="ig-link" href="${escapeAttr(igUrl(r.instagram))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.instagram)}</a><button type="button" class="ig-edit" data-igedit="${r.id}" aria-label="Editar Instagram"><svg class="i" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`
           : `<input type="text" data-f="instagram" value="" placeholder="@usuario" aria-label="Instagram" autocapitalize="off" autocorrect="off">`}</td>
@@ -1155,7 +1166,7 @@
         <td><input type="checkbox" class="chk" data-f="pago" ${r.pago ? 'checked' : ''} aria-label="Pagó"></td>
         <td class="del"><button type="button" class="lu-del" data-del="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
       </tr>`).join('');
-    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="10" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
+    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
     updateLineupStats(rows);
     if (lineupFocusId) {
       const el = lineupTable.querySelector(`tr[data-id="${lineupFocusId}"] input[data-f="name"]`);
@@ -1164,7 +1175,7 @@
     }
   }
   document.getElementById('lineupOpenBtn').addEventListener('click', () => { lineupOverlay.classList.add('open'); renderLineup(); });
-  document.getElementById('lineupBackBtn').addEventListener('click', () => lineupOverlay.classList.remove('open'));
+  document.getElementById('lineupBackBtn').addEventListener('click', () => { closeInfoPop(); lineupOverlay.classList.remove('open'); });
   document.getElementById('lineupAddBtn').addEventListener('click', async () => {
     try {
       const ref = await addDoc(lineupCol, { name: '', discipline: '', contact: '', created: Date.now() });
@@ -1183,7 +1194,42 @@
   });
   lineupTable.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('input[type=text]')) e.target.blur(); });
   lineupTable.addEventListener('focusout', () => setTimeout(renderLineup, 150));
+  // ventana flotante de "+ Info": se abre pegada a la celda
+  let infoPop = null;
+  function closeInfoPop() {
+    if (!infoPop) return;
+    const { el, id, ta } = infoPop; infoPop = null;
+    const row = lineup.find(x => x.id === id);
+    const val = ta.value.trim();
+    el.remove();
+    if (row && (row.info || '') !== val) updateDoc(doc(db, 'boards', BOARD, 'lineup', id), { info: val }).catch(console.error);
+  }
+  function openInfoPop(btn) {
+    const id = btn.dataset.info;
+    if (infoPop && infoPop.id === id) { closeInfoPop(); return; }
+    closeInfoPop();
+    const row = lineup.find(x => x.id === id);
+    const el = document.createElement('div');
+    el.className = 'info-pop';
+    el.innerHTML = '<textarea placeholder="Más info…" aria-label="+ Info"></textarea>';
+    const ta = el.firstChild; ta.value = (row && row.info) || '';
+    lineupOverlay.appendChild(el);
+    const r = btn.getBoundingClientRect(), h = el.offsetHeight, w = el.offsetWidth;
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+    const up = r.bottom + 10 + h > window.innerHeight && r.top - 10 - h > 0;
+    el.style.left = left + 'px';
+    el.style.top = (up ? r.top - h - 10 : r.bottom + 10) + 'px';
+    el.style.setProperty('--ax', Math.max(12, Math.min(r.left + 20 - left, w - 28)) + 'px');
+    el.classList.toggle('up', up);
+    infoPop = { el, id, ta };
+    ta.focus();
+  }
+  document.addEventListener('mousedown', (e) => { if (infoPop && !infoPop.el.contains(e.target) && !e.target.closest('[data-info]')) closeInfoPop(); });
+  document.addEventListener('keydown', (e) => { if (infoPop && e.key === 'Escape') closeInfoPop(); });
+  document.querySelector('.lu-wrap').addEventListener('scroll', closeInfoPop);
   lineupTable.addEventListener('click', (e) => {
+    const ib = e.target.closest('[data-info]');
+    if (ib) { openInfoPop(ib); return; }
     const ed = e.target.closest('[data-igedit]');
     if (ed) {
       const r = lineup.find(x => x.id === ed.dataset.igedit);
