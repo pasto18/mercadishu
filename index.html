@@ -408,7 +408,7 @@
   .lu-tools .btn { width: auto; height: 44px; padding: 0 16px; }
   .lu-stats { font-size: 13px; color: var(--n700); margin-left: auto; }
   .lu-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
-  .lu-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 980px; font-size: 14px; }
+  .lu-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 820px; font-size: 14px; }
   .lu-table th { position: sticky; top: 0; z-index: 3; background: var(--ink); color: var(--bg); font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; text-align: center; padding: 12px 8px; white-space: nowrap; }
   .lu-table th:first-child, .lu-table td:first-child { position: sticky; left: 0; z-index: 2; text-align: left; }
   .lu-table th:first-child { z-index: 4; padding-left: 12px; }
@@ -1093,12 +1093,13 @@
   let lineup = [];
   let lineupFocusId = null;
   const LU_DISCIPLINES = ['TATTOOS', 'LIBROS', 'TAROT', 'ILUSTRACIÓN', 'ROPA', 'CASSETTES', 'OTROS'];
-  const LU_CHECKS = [['invitar', 'Invitar'], ['visado', 'Visado'], ['si', 'Sí'], ['no', 'No'], ['formEnviado', 'Form enviado'], ['formRecibido', 'Form recibido'], ['pago', 'Pagó']];
+  const LU_CHECKS = [['invitar', 'Contactado'], ['formEnviado', 'Form enviado'], ['formRecibido', 'Form recibido']];
+  const luState = r => r.viene === 'SÍ' ? 'st-si' : r.viene === 'NO' ? 'st-no' : '';
   const lineupOverlay = document.getElementById('lineupOverlay');
   const lineupTable = document.getElementById('lineupTable');
   function updateLineupStats(rows) {
     const n = f => rows.filter(r => r[f]).length;
-    document.getElementById('lineupStats').textContent = `${rows.length} en la lista · ${n('si')} sí · ${n('no')} no · ${n('pago')} pagaron`;
+    document.getElementById('lineupStats').textContent = `${rows.length} en la lista · ${rows.filter(r => r.viene === 'SÍ').length} vienen · ${rows.filter(r => r.viene === 'NO').length} no vienen · ${n('pago')} pagaron`;
   }
   function renderLineup() {
     if (!lineupOverlay.classList.contains('open')) return;
@@ -1113,7 +1114,7 @@
     if (domIds.length && domIds.join() === rows.map(r => r.id).join()) {
       rows.forEach(r => {
         const tr = lineupTable.querySelector(`tr[data-id="${r.id}"]`);
-        tr.className = r.si ? 'st-si' : r.no ? 'st-no' : '';
+        tr.className = luState(r);
         tr.querySelectorAll('[data-f]').forEach(el => {
           if (el === document.activeElement) return;
           if (el.type === 'checkbox') el.checked = !!r[el.dataset.f];
@@ -1123,16 +1124,18 @@
       updateLineupStats(rows);
       return;
     }
-    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Quién contacta</th>${LU_CHECKS.map(c => `<th>${c[1]}</th>`).join('')}<th></th></tr></thead>`;
+    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>Quién contacta</th>${LU_CHECKS.map(c => `<th>${c[1]}</th>`).join('')}<th>¿Viene?</th><th>Pagó</th><th></th></tr></thead>`;
     const body = rows.map(r => `
-      <tr data-id="${r.id}" class="${r.si ? 'st-si' : r.no ? 'st-no' : ''}">
+      <tr data-id="${r.id}" class="${luState(r)}">
         <td><input type="text" data-f="name" value="${escapeAttr(r.name || '')}" placeholder="Nombre" aria-label="Artista"></td>
         <td><select data-f="discipline" aria-label="Disciplina">${opt(discs, r.discipline)}</select></td>
         <td><select data-f="contact" aria-label="Quién contacta">${opt(people, r.contact)}</select></td>
         ${LU_CHECKS.map(c => `<td><input type="checkbox" class="chk" data-f="${c[0]}" ${r[c[0]] ? 'checked' : ''} aria-label="${c[1]}"></td>`).join('')}
+        <td><select data-f="viene" aria-label="¿Viene?"><option value=""></option><option value="SÍ" ${r.viene === 'SÍ' ? 'selected' : ''}>SÍ</option><option value="NO" ${r.viene === 'NO' ? 'selected' : ''}>NO</option></select></td>
+        <td><input type="checkbox" class="chk" data-f="pago" ${r.pago ? 'checked' : ''} aria-label="Pagó"></td>
         <td class="del"><button type="button" class="lu-del" data-del="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
       </tr>`).join('');
-    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
+    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="9" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
     updateLineupStats(rows);
     if (lineupFocusId) {
       const el = lineupTable.querySelector(`tr[data-id="${lineupFocusId}"] input[data-f="name"]`);
@@ -1155,8 +1158,6 @@
     const f = el.dataset.f;
     let val = el.type === 'checkbox' ? el.checked : el.value.trim();
     const patch = { [f]: val };
-    // Sí y No son excluyentes
-    if (el.type === 'checkbox' && val && (f === 'si' || f === 'no')) patch[f === 'si' ? 'no' : 'si'] = false;
     updateDoc(doc(db, 'boards', BOARD, 'lineup', tr.dataset.id), patch).catch(console.error);
   });
   lineupTable.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('input[type=text]')) e.target.blur(); });
