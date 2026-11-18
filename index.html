@@ -457,6 +457,17 @@
   .ec-row .lu-del { width: 40px; }
   .ec-empty { padding: 18px 12px; text-align: center; color: var(--n700); font-size: 14px; }
   @media (min-width: 1024px) { .ec-cols { grid-template-columns: 1fr 1fr; align-items: start; } .ec-inner { margin: 0 auto; } }
+  .lu-wrap { overflow: auto; max-height: calc(100dvh - 120px); padding-bottom: 0; }
+  .lu-table thead tr:first-child th { height: 40px; padding: 0 8px; }
+  .lu-table thead tr.lu-f th { top: 40px; z-index: 3; background: var(--surface); padding: 4px 6px; border-bottom: 2px solid var(--ink); }
+  .lu-table thead tr.lu-f th:first-child { z-index: 4; }
+  .lu-table thead tr:first-child th:last-child, .lu-table thead tr.lu-f th:last-child { z-index: 4; }
+  .sort-btn { display: inline-flex; align-items: center; gap: 4px; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; height: 40px; }
+  .sort-btn .arr { display: inline-block; width: 10px; font-size: 10px; opacity: .45; }
+  .lu-table th.sorted .arr { opacity: 1; }
+  .lu-f input, .lu-f select { width: 100%; min-width: 0; height: 32px; border: 1px solid var(--divider); background: var(--bg); border-radius: 6px; font-size: 12px; font-weight: 600; padding: 0 6px; color: var(--ink); text-transform: none; letter-spacing: 0; }
+  .lu-f input:focus, .lu-f select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .lu-f input.on, .lu-f select.on { background: var(--a100); border-color: var(--accent); }
   .lu-table td.info { min-width: 190px; max-width: 240px; }
   .info-cell { display: block; width: 100%; height: 46px; padding: 0 12px; text-align: left; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .info-cell.empty { color: var(--n600); font-weight: 700; }
@@ -693,6 +704,7 @@
       </div>
       <div class="lu-tools">
         <button type="button" class="btn btn-pri" id="lineupAddBtn">Añadir<svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+        <button type="button" class="btn btn-sec" id="lineupClearBtn" hidden>Quitar filtros</button>
         <span class="lu-stats" id="lineupStats"></span>
       </div>
       <div class="lu-wrap"><table class="lu-table" id="lineupTable"></table></div>
@@ -1172,17 +1184,76 @@
   const luState = r => r.viene === 'SÍ' ? 'st-si' : r.viene === 'NO' ? 'st-no' : '';
   const lineupOverlay = document.getElementById('lineupOverlay');
   const lineupTable = document.getElementById('lineupTable');
-  function updateLineupStats(rows) {
+  function updateLineupStats(rows, shown) {
     const n = f => rows.filter(r => r[f]).length;
-    document.getElementById('lineupStats').textContent = `${rows.length} en la lista · ${rows.filter(r => r.viene === 'SÍ').length} vienen · ${rows.filter(r => r.viene === 'NO').length} no vienen · ${n('pago')} pagaron`;
+    document.getElementById('lineupStats').textContent = `${shown !== undefined && shown !== rows.length ? shown + ' de ' : ''}${rows.length} en la lista · ${rows.filter(r => r.viene === 'SÍ').length} vienen · ${rows.filter(r => r.viene === 'NO').length} no vienen · ${n('pago')} pagaron`;
+  }
+  const LU_COLS = [
+    { f: 'name', label: 'Artista', t: 'text' }, { f: 'discipline', label: 'Disciplina', t: 'sel' },
+    { f: 'info', label: '+ Info', t: 'text' }, { f: 'instagram', label: 'Instagram', t: 'text' },
+    { f: 'contact', label: 'Quién contacta', t: 'sel' }, { f: 'invitar', label: 'Contactado', t: 'chk' },
+    { f: 'viene', label: '¿Viene?', t: 'sel' }, { f: 'formEnviado', label: 'Form enviado', t: 'chk' },
+    { f: 'formRecibido', label: 'Form recibido', t: 'chk' }, { f: 'pago', label: 'Pagó', t: 'chk' }];
+  let luSort = { f: 'name', dir: 1 }, luFilter = {}, luHeadSig = '';
+  const luCmpStr = (a, b) => String(a).localeCompare(String(b), 'es', { sensitivity: 'base', numeric: true });
+  function luView(all) {
+    const act = LU_COLS.filter(c => luFilter[c.f]);
+    let rows = all.filter(r => act.every(c => {
+      const v = luFilter[c.f], x = r[c.f];
+      if (c.t === 'text') return String(x || '').toLowerCase().includes(v.toLowerCase());
+      if (c.t === 'chk') return v === '1' ? !!x : !x;
+      return v === '__empty' ? !x : x === v;
+    }));
+    const col = LU_COLS.find(c => c.f === luSort.f) || LU_COLS[0];
+    return rows.sort((a, b) => {
+      const x = a[col.f], y = b[col.f];
+      if (col.t === 'chk') { const d = (x ? 1 : 0) - (y ? 1 : 0); if (d) return d * luSort.dir; }
+      else if (!x !== !y) return x ? -1 : 1; // vacíos siempre al final
+      else if (x) { const d = luCmpStr(x, y); if (d) return d * luSort.dir; }
+      return luCmpStr(a.name || '', b.name || '') || (a.created || 0) - (b.created || 0);
+    });
+  }
+  function luSelOptions(c, all) {
+    let vals;
+    if (c.f === 'viene') vals = ['SÍ', 'NO'];
+    else if (c.f === 'discipline') vals = [...new Set([...LU_DISCIPLINES, ...all.map(r => r.discipline).filter(Boolean)])];
+    else vals = [...new Set([...NAMES, ...all.map(r => r.contact).filter(Boolean)])];
+    return `<option value="">Todos</option><option value="__empty">(vacío)</option>` + vals.map(v => `<option value="${escapeAttr(v)}">${escapeHtml(v)}</option>`).join('');
+  }
+  function ensureLuHead(all) {
+    const sig = LU_COLS.filter(c => c.t === 'sel').map(c => luSelOptions(c, all)).join('|');
+    if (lineupTable.querySelector('thead') && sig === luHeadSig) return;
+    if (lineupTable.querySelector('thead') && lineupTable.querySelector('thead').contains(document.activeElement) && document.activeElement.tagName === 'SELECT') return;
+    luHeadSig = sig;
+    const th = LU_COLS.map(c => `<th data-col="${c.f}"><button type="button" class="sort-btn" data-sort="${c.f}">${c.label}<span class="arr"></span></button></th>`).join('') + '<th></th>';
+    const fl = LU_COLS.map(c => `<th>${c.t === 'text'
+      ? `<input type="text" data-lf="${c.f}" placeholder="Filtrar" aria-label="Filtrar ${c.label}">`
+      : c.t === 'chk'
+        ? `<select data-lf="${c.f}" aria-label="Filtrar ${c.label}"><option value="">Todos</option><option value="1">Sí</option><option value="0">No</option></select>`
+        : `<select data-lf="${c.f}" aria-label="Filtrar ${c.label}">${luSelOptions(c, all)}</select>`}</th>`).join('') + '<th></th>';
+    let tbody = lineupTable.querySelector('tbody');
+    lineupTable.innerHTML = `<thead><tr>${th}</tr><tr class="lu-f">${fl}</tr></thead>`;
+    lineupTable.appendChild(tbody || document.createElement('tbody'));
+    lineupTable.querySelectorAll('[data-lf]').forEach(el => { el.value = luFilter[el.dataset.lf] || ''; el.classList.toggle('on', !!el.value); });
+  }
+  function updateLuSortUi() {
+    lineupTable.querySelectorAll('thead th[data-col]').forEach(t => {
+      const on = t.dataset.col === luSort.f;
+      t.classList.toggle('sorted', on);
+      t.querySelector('.arr').textContent = on ? (luSort.dir === 1 ? '▲' : '▼') : '↕';
+    });
+    document.getElementById('lineupClearBtn').hidden = !Object.values(luFilter).some(Boolean);
   }
   function renderLineup() {
     if (!lineupOverlay.classList.contains('open')) return;
     const ae = document.activeElement;
-    if (ae && lineupTable.contains(ae) && ae.tagName === 'INPUT' && ae.type === 'text') return; // no pisar lo que se está escribiendo
-    const rows = [...lineup].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }) || (a.created || 0) - (b.created || 0));
-    const people = [...new Set([...NAMES, ...rows.map(r => r.contact).filter(Boolean)])];
-    const discs = [...new Set([...LU_DISCIPLINES, ...rows.map(r => r.discipline).filter(Boolean)])];
+    if (ae && lineupTable.contains(ae) && ae.tagName === 'INPUT' && ae.type === 'text' && !ae.closest('thead')) return; // no pisar lo que se está escribiendo
+    const allRows = [...lineup];
+    const rows = luView(allRows);
+    ensureLuHead(allRows);
+    updateLuSortUi();
+    const people = [...new Set([...NAMES, ...allRows.map(r => r.contact).filter(Boolean)])];
+    const discs = [...new Set([...LU_DISCIPLINES, ...allRows.map(r => r.discipline).filter(Boolean)])];
     const opt = (list, cur) => `<option value=""></option>` + list.map(v => `<option value="${escapeAttr(v)}" ${v === cur ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('');
     // si las filas son las mismas y en el mismo orden, se actualizan los valores en su sitio (no se pierde el foco ni los clics)
     const domIds = [...lineupTable.querySelectorAll('tbody tr[data-id]')].map(tr => tr.dataset.id + ':' + tr.dataset.ig);
@@ -1198,10 +1269,9 @@
           else if (el.value !== (r[el.dataset.f] || '')) el.value = r[el.dataset.f] || '';
         });
       });
-      updateLineupStats(rows);
+      updateLineupStats(allRows, rows.length);
       return;
     }
-    const head = `<thead><tr><th>Artista</th><th>Disciplina</th><th>+ Info</th><th>Instagram</th><th>Quién contacta</th><th>Contactado</th><th>¿Viene?</th><th>Form enviado</th><th>Form recibido</th><th>Pagó</th><th></th></tr></thead>`;
     const body = rows.map(r => `
       <tr data-id="${r.id}" data-ig="${r.instagram ? 1 : 0}" class="${luState(r)}">
         <td><input type="text" data-f="name" value="${escapeAttr(r.name || '')}" placeholder="Nombre" aria-label="Artista"></td>
@@ -1218,8 +1288,8 @@
         <td><input type="checkbox" class="chk" data-f="pago" ${r.pago ? 'checked' : ''} aria-label="Pagó"></td>
         <td class="del"><button type="button" class="lu-del" data-del="${r.id}" aria-label="Borrar"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
       </tr>`).join('');
-    lineupTable.innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="lu-empty" style="position:static">Aún no hay nadie. Pulsa "Añadir" para empezar la lista.</td></tr>`}</tbody>`;
-    updateLineupStats(rows);
+    lineupTable.querySelector('tbody').innerHTML = body || `<tr><td colspan="11" class="lu-empty" style="position:static">${allRows.length ? 'Ningún resultado con esos filtros.' : 'Aún no hay nadie. Pulsa "Añadir" para empezar la lista.'}</td></tr>`;
+    updateLineupStats(allRows, rows.length);
     if (lineupFocusId) {
       const el = lineupTable.querySelector(`tr[data-id="${lineupFocusId}"] input[data-f="name"]`);
       if (el) el.focus();
@@ -1278,7 +1348,20 @@
   document.addEventListener('mousedown', (e) => { if (infoPop && !infoPop.el.contains(e.target) && !e.target.closest('[data-info]')) closeInfoPop(); });
   document.addEventListener('keydown', (e) => { if (infoPop && e.key === 'Escape') closeInfoPop(); });
   document.querySelector('.lu-wrap').addEventListener('scroll', closeInfoPop);
+  lineupTable.addEventListener('input', (e) => {
+    const lf = e.target.closest('[data-lf]'); if (!lf) return;
+    luFilter[lf.dataset.lf] = lf.value; lf.classList.toggle('on', !!lf.value); renderLineup();
+  });
+  document.getElementById('lineupClearBtn').addEventListener('click', () => {
+    luFilter = {}; lineupTable.querySelectorAll('[data-lf]').forEach(el => { el.value = ''; el.classList.remove('on'); }); renderLineup();
+  });
   lineupTable.addEventListener('click', (e) => {
+    const sb = e.target.closest('[data-sort]');
+    if (sb) {
+      const f = sb.dataset.sort;
+      luSort = luSort.f !== f ? { f, dir: 1 } : luSort.dir === 1 ? { f, dir: -1 } : { f: 'name', dir: 1 };
+      renderLineup(); return;
+    }
     const ib = e.target.closest('[data-info]');
     if (ib) { openInfoPop(ib); return; }
     const ed = e.target.closest('[data-igedit]');
